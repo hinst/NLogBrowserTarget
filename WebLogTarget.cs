@@ -60,12 +60,18 @@ namespace NLogBrowserTarget
 			var context = listener.EndGetContext(data);
 			var request = context.Request;
 			var localPath = request.Url.LocalPath;
+			var response = context.Response;
 			var responseText = "";
 			if (localPath == "/page/")
 			{
+				response.Headers["Content-Type"] = "text/html; encoding=utf-8";
 				responseText = getPage();
 			}
-			var response = context.Response;
+			if (localPath == "/update/")
+			{
+				response.Headers["Content-Type"] = "text/json; encoding=utf-8";
+				responseText = getUpdate();
+			}
 			var responseData = Encoding.UTF8.GetBytes(responseText);
 			response.OutputStream.Write(responseData, 0, responseData.Length);
 			response.OutputStream.Close();
@@ -75,6 +81,10 @@ namespace NLogBrowserTarget
 		string getPage()
 		{
 			return logPage;
+		}
+		
+		string getUpdate()
+		{
 		}
 		
 	}

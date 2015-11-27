@@ -10,17 +10,16 @@
 	<body>
 		<script>
 			var updateInterval = 500;
-			var receiveUpdate = function(request) {
-				if (request.readyState == 4) {
-					setTimeout(update, updateInterval);					
-				}
-			}
 			var update = function() {
 				var request = new XMLHttpRequest();
 				request.open("GET", "/update/", true);
 				request.onreadystatechange = function() {
-					receiveUpdate(request);
-				}
+					if (request.readyState == 4) {
+						var responseText = request.responseText;
+						console.log("got response: '" + responseText + "'");
+						setTimeout(update, updateInterval);
+					}
+				};
 				request.send();				
 			}
 			setTimeout(update, updateInterval);
