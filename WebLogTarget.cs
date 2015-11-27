@@ -52,7 +52,10 @@ namespace NLogBrowserTarget
 		
 		protected override void Write(LogEventInfo logEvent)
 		{
-			logEventQueue.Enqueue(logEvent);
+			lock (logEventQueue)
+			{
+				logEventQueue.Enqueue(logEvent);
+			}
 		}
 		
 		void processRequest(IAsyncResult data)
@@ -64,12 +67,12 @@ namespace NLogBrowserTarget
 			var responseText = "";
 			if (localPath == "/page/")
 			{
-				response.Headers["Content-Type"] = "text/html; encoding=utf-8";
+				response.Headers["Content-Type"] = "text/html; charset=utf-8";
 				responseText = getPage();
 			}
 			if (localPath == "/update/")
 			{
-				response.Headers["Content-Type"] = "text/json; encoding=utf-8";
+				response.Headers["Content-Type"] = "text/xml; charset=utf-8";
 				responseText = getUpdate();
 			}
 			var responseData = Encoding.UTF8.GetBytes(responseText);
@@ -85,6 +88,17 @@ namespace NLogBrowserTarget
 		
 		string getUpdate()
 		{
+			var messages = new List<LogEventInfo>();
+			lock (logEventQueue)
+			{
+				while (logEventQueue.Count > 0)
+				{
+					var info = logEventQueue.Dequeue();
+					messages.Add(info);
+				}
+			}
+			var element = new LogEventInfoXmlWriter().toXElement(messages.ToArray());
+			return element.ToString();
 		}
 		
 	}
