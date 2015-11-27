@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+# SharpDevelop 5.0
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLogBrowserTarget", "NLogBrowserTarget.csproj", "{DEDDB11B-4DC4-474A-97F9-F998393E0623}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DEDDB11B-4DC4-474A-97F9-F998393E0623}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEDDB11B-4DC4-474A-97F9-F998393E0623}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEDDB11B-4DC4-474A-97F9-F998393E0623}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEDDB11B-4DC4-474A-97F9-F998393E0623}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
