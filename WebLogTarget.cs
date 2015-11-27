@@ -8,7 +8,7 @@ using NLog.Targets;
 namespace NLogBrowserTarget
 {
 
-	[Target("WebBrowser")]
+	[Target("WebLog")]
 	public class WebLogTarget : Target
 	{
 	
@@ -21,18 +21,15 @@ namespace NLogBrowserTarget
 		public WebLogTarget()
 		{
 			port = defaultPort;
+			listener = new HttpListener();
+			listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
+			listener.Start();
+			listener.BeginGetContext(processRequest, null);
 		}
 		
 		protected override void Write(LogEventInfo logEvent)
 		{
 			logEventQueue.Enqueue(logEvent);
-			if (listener == null)
-			{
-				listener = new HttpListener();
-				listener.Prefixes.Add("http://127.0.0.1:" + port + "/");
-				listener.Start();
-				listener.BeginGetContext(processRequest, null);
-			}
 		}
 		
 		void processRequest(IAsyncResult data)
@@ -40,6 +37,12 @@ namespace NLogBrowserTarget
 			var context = listener.EndGetContext(data);
 			var request = context.Request;
 			var response = context.Response;
+		}
+		
+		~WebLogTarget()
+		{
+			listener.Close();
+			listener = null;
 		}
 	
 	}

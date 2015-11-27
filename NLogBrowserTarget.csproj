@@ -58,9 +58,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <Resource Include="bootstrap.min.css" />
-    <None Include="NLog.config">
+    <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="NLog.xsd" />
     <None Include="packages.config" />
   </ItemGroup>
