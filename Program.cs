@@ -20,6 +20,7 @@ namespace NLogBrowserTarget
 		
 		void run()
 		{
+			log.Debug("heh");
 			postSpamsThread = new Thread(postSpams);
 			postSpamsThread.Start();
 			while (true)
@@ -40,7 +41,7 @@ namespace NLogBrowserTarget
 			while (false == postSpamsTerminated)
 			{
 				Thread.Sleep(600);
-				log.Debug("heh " + counter);
+				log.Debug("heh " + counter + " " + Thread.CurrentThread.ManagedThreadId + " <b>");
 				counter++;
 			}		
 		}

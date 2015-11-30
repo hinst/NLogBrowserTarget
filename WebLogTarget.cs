@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Text;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -18,7 +19,7 @@ namespace NLogBrowserTarget
 		[DefaultParameter]
 		public int port { get; set; }
 		const int defaultPort = 16109;
-		readonly Queue<LogEventInfo> logEventQueue = new Queue<LogEventInfo>();
+		readonly Queue<LogEventInfoEx> logEventQueue = new Queue<LogEventInfoEx>();
 		HttpListener listener;
 		string logPage;
 		
@@ -37,7 +38,6 @@ namespace NLogBrowserTarget
 		{
 			var assembly = Assembly.GetExecutingAssembly();
 			var resourceName = assembly.GetName().Name + "." + name;
-			Console.WriteLine("!!!"+resourceName+"!!!");
 			var stream = assembly.GetManifestResourceStream(resourceName);
 			var streamReader = new StreamReader(stream, Encoding.UTF8);
 			var text = streamReader.ReadToEnd();
@@ -50,11 +50,14 @@ namespace NLogBrowserTarget
 			logPage = logPage.Replace("$bootstrap-css$", readTextResource("bootstrap.min.css"));
 		}
 		
-		protected override void Write(LogEventInfo logEvent)
+		protected override void Write(LogEventInfo info)
 		{
 			lock (logEventQueue)
 			{
-				logEventQueue.Enqueue(logEvent);
+				var infoEx = new LogEventInfoEx();
+				infoEx.V = info;
+				infoEx.threadID = Thread.CurrentThread.ManagedThreadId;
+				logEventQueue.Enqueue(infoEx);
 			}
 		}
 		
@@ -88,7 +91,7 @@ namespace NLogBrowserTarget
 		
 		string getUpdate()
 		{
-			var messages = new List<LogEventInfo>();
+			var messages = new List<LogEventInfoEx>();
 			lock (logEventQueue)
 			{
 				while (logEventQueue.Count > 0)

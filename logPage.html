@@ -8,15 +8,59 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>
+		<div class="container">
+			<table class="table" id="logTable">
+			</table>
+		</div>
 		<script>
 			var updateInterval = 500;
+			var logTable = document.getElementById("logTable");
+			var tableRowCountLimit = 10;
+			function escapeTags(str) {
+    			return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
+			}
+			var getLevelText = function(level) {
+				var text = '<span class="label $label-class$">$text$</span>';
+				var subClass = "";
+				text = text.replace("$text$", level);
+				if (level == "Debug") {
+					 subClass = "label-success";
+				}
+				if (subClass.length > 0)
+					text = text.replace("$label-class$", subClass);
+				return text;
+			}
+			var addLogMessage = function(message) {
+				var time = message.getAttribute("time");
+				//console.log(time);
+				var row = logTable.insertRow(0);
+				var timeCell = row.insertCell(-1);
+				timeCell.innerHTML = "<b>" + time + "</b>";
+				var levelCell = row.insertCell(-1);
+				levelCell.innerHTML = getLevelText(message.getAttribute("level"));
+				var textCell = row.insertCell(-1);
+				textCell.innerHTML = escapeTags(message.getAttribute("message"));
+				if (logTable.rows.length > tableRowCountLimit) {
+					logTable.deleteRow(logTable.rows.length - 1);
+				}
+			}
+			var addLogMessages = function(messagesDocument) {
+				var messages = messagesDocument.getElementsByTagName("logMessage");
+				for (var i = 0; i < messages.length; i++) {
+					var message = messages[i];
+					addLogMessage(message);
+				}
+			}
 			var update = function() {
 				var request = new XMLHttpRequest();
 				request.open("GET", "/update/", true);
 				request.onreadystatechange = function() {
 					if (request.readyState == 4) {
 						var responseText = request.responseText;
-						console.log("got response: '" + responseText + "'");
+						var parser = new DOMParser();
+						var messages = parser.parseFromString(responseText, "text/xml");
+						addLogMessages(messages);
+						//console.log("got response: '" + responseText + "'");
 						setTimeout(update, updateInterval);
 					}
 				};
@@ -24,9 +68,5 @@
 			}
 			setTimeout(update, updateInterval);
 		</script>
-		<div class="container">
-			<table class="table">
-			</table>
-		</div>
 	</body>
 </html>
